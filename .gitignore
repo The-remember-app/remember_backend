@@ -1,0 +1,7 @@
+/**/.idea/**/*
+/**/.env
+!/**/.example.env
+/**/__pycashe__/**/*
+/**/venv/**/*
+/**/env/**/*
+/**/*.lnk
