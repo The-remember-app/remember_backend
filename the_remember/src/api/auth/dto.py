@@ -8,26 +8,13 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from the_remember.src.utils.init_app import init_app
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
+class TokenData(BaseModel):
+    username: str | None = None
 
 
-
-
-
-
-
-
-app = FastAPI()
-app = init_app(app)
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    uvicorn.run("main:app", host='localhost', port=10010, reload=True)

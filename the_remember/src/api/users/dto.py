@@ -8,26 +8,13 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from the_remember.src.utils.init_app import init_app
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
 
 
-
-
-
-
-
-
-
-
-app = FastAPI()
-app = init_app(app)
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    uvicorn.run("main:app", host='localhost', port=10010, reload=True)
+class UserInDB(User):
+    hashed_password: str
