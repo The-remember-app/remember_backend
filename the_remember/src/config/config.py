@@ -7,7 +7,12 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import create_async_engine
+import os
+from dotenv import load_dotenv
 
+# load_dotenv()
+# MY_ENV_VAR = os.getenv('')
 
 class ConfigBuilder(object):
     # to get a string like this run:
@@ -18,6 +23,19 @@ class ConfigBuilder(object):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+    POSTGRES_DB = os.environ['POSTGRES_DB']
+    POSTGRES_USER = os.environ['POSTGRES_USER']
+    POSTGRES_PASSWORD = os.environ['POSTGRES_PASSWORD']
+    POSTGRES_HOST = os.environ['POSTGRES_HOST']
+    POSTGRES_PORT = os.environ['POSTGRES_PORT']
+
+
+
+    engine = create_async_engine(
+        "postgresql+asyncpg://scott:tiger@localhost/test",
+        echo=True,
+    )
 
 
 CONFIG = ConfigBuilder()

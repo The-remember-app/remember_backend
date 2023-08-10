@@ -8,21 +8,21 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from the_remember.src.api.auth.logics import get_current_active_user
-from the_remember.src.api.users.dto import User
+from the_remember.src.api.auth.logics import get_current_user
+from the_remember.src.api.users.dto import UserDTO
 
 user_app = APIRouter()
 
 
-@user_app.get("/users/me/", response_model=User)
+@user_app.get("/users/me/", response_model=UserDTO)
 async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_active_user)]
+    current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     return current_user
 
 
 @user_app.get("/users/me/items/")
 async def read_own_items(
-    current_user: Annotated[User, Depends(get_current_active_user)]
+    current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     return [{"item_id": "Foo", "owner": current_user.username}]
