@@ -10,3 +10,5 @@ asyncpg==0.28.0
 alembic==1.11.2
 
 python-dotenv==1.0.0
+
+orjson==3.9.4

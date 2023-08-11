@@ -32,14 +32,19 @@ services:
     image: daniinxorchenabo/the_remember_app_backend:latest
     build:
       context: ./the_remember
-    command: python main.py
+
+    command:      >
+      bash -c "
+      python -m alembic --config .\the_remember\src\repo\migration/_alembic.ini  upgrade head 
+       && uvicorn main:app --port ${TR_BACKEND_PORT} --host 0.0.0.0 --workers ${TR_BACKEND_APP_WORKERS_COUNT} --log-level debug      "
+
     links:
       - "db:database"
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
     ports:
-      - "10010:10010"
+      - "${TR_BACKEND_PORT}:${TR_BACKEND_PORT}"
     env_file:
       -  env/.env
     volumes:
