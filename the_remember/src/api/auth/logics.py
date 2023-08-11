@@ -14,7 +14,7 @@ from the_remember.src.api.auth.dto import TokenData
 from the_remember.src.api.users.db_model import UserORM
 from the_remember.src.api.users.dto import UserInDbDTO, UserDTO
 from the_remember.src.config.config import CONFIG
-from the_remember.src.db_models.fake_db import fake_users_db
+# from the_remember.src.db_models.fake_db import fake_users_db
 
 
 def verify_password(plain_password, hashed_password):

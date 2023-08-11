@@ -10,23 +10,8 @@ from pydantic import BaseModel
 
 from the_remember.src.utils.init_app import init_app
 
-
-
-
-
-
-
-
-
-
 app = FastAPI()
 app = init_app(app)
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
