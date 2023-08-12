@@ -48,3 +48,5 @@ class PersonalizeModuleORM(AbstractDbEntity):
     is_reverse_definition_choice: Mapped[bool] = mapped_column(server_default=sa.text("false"))
     standard_and_reverse_choice: Mapped[bool] = mapped_column(server_default=sa.text("false"))
     # PrimaryKeyConstraint(module_id, user_id)
+
+    module: Mapped[ModuleORM] = relationship()

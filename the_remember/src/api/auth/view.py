@@ -9,19 +9,22 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from the_remember.src.api.auth.dto import Token
-from the_remember.src.api.auth.logics import authenticate_user, create_access_token
+from the_remember.src.api.auth.logics import authenticate_user, create_access_token, get_db_session
 from the_remember.src.config.config import CONFIG
-from the_remember.src.db_models.fake_db import fake_users_db
+# from the_remember.src.db_models.fake_db import fake_users_db
 
 auth_app = APIRouter()
 
+
 @auth_app.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+  db_session: Annotated[AsyncSession, Depends(get_db_session)]
 ):
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    user = await authenticate_user(form_data.username, form_data.password, db_session)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

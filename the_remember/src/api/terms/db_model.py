@@ -21,6 +21,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import selectinload
 from sqlalchemy.dialects.postgresql import UUID as pUUID
 
+from the_remember.src.api.modules.db_model import ModuleORM
 from the_remember.src.utils.db import AbstractDbEntity
 
 
@@ -54,3 +55,8 @@ class PersonalizeTermORM(AbstractDbEntity):
 
 
     ForeignKeyConstraint([module_id, user_id], ['personalize_module.module_id', 'personalize_module.user_id'])
+
+    module_entity: Mapped[ModuleORM] = relationship()
+    term_entity: Mapped[TermORM] = relationship()
+
+

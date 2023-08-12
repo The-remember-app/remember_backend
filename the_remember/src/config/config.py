@@ -24,7 +24,7 @@ class ConfigBuilder(object):
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
     POSTGRES_DB = os.environ['POSTGRES_DB']
     POSTGRES_USER = os.environ['POSTGRES_USER']

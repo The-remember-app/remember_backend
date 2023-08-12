@@ -16,6 +16,22 @@ from the_remember.src.api.users.dto import UserInDbDTO, UserDTO
 from the_remember.src.config.config import CONFIG
 # from the_remember.src.db_models.fake_db import fake_users_db
 
+async def get_db_session():
+    async_session = async_sessionmaker(CONFIG.engine, expire_on_commit=False)
+    async with async_session() as session:
+        if True:
+        # async with session.begin():
+            try:
+                yield session
+            finally:
+                pass
+
+async def get_db_write_session(
+        db_session: Annotated[AsyncSession, Depends(get_db_session)]
+):
+    async with db_session.begin():
+        yield db_session
+
 
 def verify_password(plain_password, hashed_password):
     return CONFIG.pwd_context.verify(plain_password, hashed_password)
@@ -25,16 +41,12 @@ def get_password_hash(password):
     return CONFIG.pwd_context.hash(password)
 
 
-async def get_user(username: str):
-    async_session = async_sessionmaker(CONFIG.engine, expire_on_commit=False)
-    async with async_session() as session:
-        res = await session.execute(select(UserORM).where(UserORM.username == username))
-        return UserDTO.model_validate(res)
 
 
 
-async def authenticate_user( username: str, password: str):
-    user = await get_user(username)
+
+async def authenticate_user( username: str, password: str, db_session: AsyncSession):
+    user = await get_user(username, db_session)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -53,7 +65,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(CONFIG.oauth2_scheme)]):
+async def get_current_user(
+        token: Annotated[str, Depends(CONFIG.oauth2_scheme)],
+        db_session: Annotated[AsyncSession, Depends(get_db_session)]
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -67,8 +82,17 @@ async def get_current_user(token: Annotated[str, Depends(CONFIG.oauth2_scheme)])
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = await get_user(username=token_data.username)
+    user = await get_user(username=token_data.username, db_session=db_session)
     if user is None:
         raise credentials_exception
     return user
 
+
+
+
+
+async def get_user(username: str, db_session: AsyncSession):
+    res = await db_session.execute(
+        select(UserORM).where(UserORM.username == username)
+    )
+    return UserInDbDTO.model_validate(next(res)[0])

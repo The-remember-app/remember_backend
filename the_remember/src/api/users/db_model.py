@@ -37,4 +37,4 @@ class UserORM(AbstractDbEntity):
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())
 
-    sub_folders: Mapped[list['FolderORM']] = relationship()
+    # sub_folders: Mapped[list['FolderORM']] = relationship()
