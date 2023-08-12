@@ -41,3 +41,6 @@ class PersonalizeTermDTO(TermDTO):
     choose_error_counter: int
     write_error_counter: int
     choice_neg_error_counter: int
+
+    personal_created_at: datetime
+    personal_updated_at: datetime

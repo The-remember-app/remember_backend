@@ -49,4 +49,8 @@ class PersonalizeModuleORM(AbstractDbEntity):
     standard_and_reverse_choice: Mapped[bool] = mapped_column(server_default=sa.text("false"))
     # PrimaryKeyConstraint(module_id, user_id)
 
-    module: Mapped[ModuleORM] = relationship()
+    personal_created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    personal_updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())
+
+
+    module_entity: Mapped[ModuleORM] = relationship()

@@ -53,6 +53,9 @@ class PersonalizeTermORM(AbstractDbEntity):
     write_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
     choice_neg_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
 
+    personal_created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    personal_updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())
+
 
     ForeignKeyConstraint([module_id, user_id], ['personalize_module.module_id', 'personalize_module.user_id'])
 

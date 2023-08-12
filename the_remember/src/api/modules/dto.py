@@ -21,7 +21,7 @@ class ModuleDTO(BaseModel, extra='ignore', from_attributes=True):
     id: UUID
     name: str
     author_id: UUID
-    root_folder_id: UUID
+    root_folder_id: UUID | None
 
     created_at: datetime
     updated_at: datetime
@@ -29,7 +29,7 @@ class ModuleDTO(BaseModel, extra='ignore', from_attributes=True):
 
 class CreateModuleDTO(BaseModel):
     name: str
-    root_folder_id: UUID
+    root_folder_id: UUID | None
 
 
 class PersonalizeModuleDTO(ModuleDTO):
@@ -39,3 +39,7 @@ class PersonalizeModuleDTO(ModuleDTO):
     standard_and_reverse_write: bool
     is_reverse_definition_choice: bool
     standard_and_reverse_choice: bool
+
+
+    personal_created_at: datetime
+    personal_updated_at: datetime

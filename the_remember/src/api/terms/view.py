@@ -18,7 +18,7 @@ term_app = APIRouter()
 
 
 @term_app.post("/create", response_model=TermDTO, status_code=201)
-async def create_folder(
+async def create_term(
         new_term: CreateTermDTO,
         db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
@@ -51,7 +51,7 @@ async def create_folder(
 
 
 @term_app.get("/all", response_model=list[PersonalizeTermDTO])
-async def get_all_folders(
+async def get_all_term(
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
@@ -67,7 +67,7 @@ async def get_all_folders(
 
 
 @term_app.get("/{term_id}", response_model=PersonalizeTermDTO)
-async def get_one_folder(
+async def get_one_term(
         term_id: UUID,
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]

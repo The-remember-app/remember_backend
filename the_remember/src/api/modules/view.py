@@ -16,7 +16,7 @@ module_app = APIRouter()
 
 
 @module_app.post("/create", response_model=ModuleDTO, status_code=201)
-async def create_folder(
+async def create_module(
         new_module: CreateModuleDTO,
         db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
@@ -34,13 +34,13 @@ async def create_folder(
 
 
 @module_app.get("/all", response_model=list[PersonalizeModuleDTO])
-async def get_all_folders(
+async def get_all_module(
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     res = await db_session.execute(
         select(PersonalizeModuleORM)
-        .join(PersonalizeModuleORM.module)
+        .join(PersonalizeModuleORM.module_entity)
         .add_columns(ModuleORM)
         .where(PersonalizeModuleORM.user_id == current_user.id)
     )
@@ -50,14 +50,14 @@ async def get_all_folders(
 
 
 @module_app.get("/{module_id}", response_model=PersonalizeModuleDTO)
-async def get_one_folder(
+async def get_one_module(
         module_id: UUID,
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     res = await db_session.execute(
         select(PersonalizeModuleORM)
-        .join(PersonalizeModuleORM.module)
+        .join(PersonalizeModuleORM.module_entity)
         .add_columns(ModuleORM)
         .where((PersonalizeModuleORM.user_id == current_user.id)
                & (PersonalizeModuleORM.module_id == module_id))
