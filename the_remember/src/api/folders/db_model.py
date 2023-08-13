@@ -24,6 +24,8 @@ from sqlalchemy.dialects.postgresql import UUID as pUUID
 from the_remember.src.utils.db import AbstractDbEntity
 
 
+
+
 class FolderORM(AbstractDbEntity):
     __tablename__ = "folder"
 
@@ -33,7 +35,9 @@ class FolderORM(AbstractDbEntity):
     root_folder_id: Mapped[UUID | None] = mapped_column(ForeignKey("folder.id"), type_=postgresql.UUID(as_uuid=True))
 
     # root_folder: Mapped[FolderORM | None] = relationship(back_populates="sub_folders", remote_side=[root_folder_id])
-    # sub_folders: Mapped[list[FolderORM]] = relationship()
+    sub_folders: Mapped[list[FolderORM]] = relationship("FolderORM", back_populates="root_folder_entity")
+    sub_modules: Mapped[list["ModuleORM"]] = relationship("ModuleORM")
+    root_folder_entity: Mapped[FolderORM] = relationship("FolderORM", back_populates='sub_folders',  remote_side=[id])
 
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())

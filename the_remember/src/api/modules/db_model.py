@@ -32,6 +32,8 @@ class ModuleORM(AbstractDbEntity):
     author_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), type_=postgresql.UUID(as_uuid=True))
     root_folder_id: Mapped[UUID | None] = mapped_column(ForeignKey("folder.id"), type_=postgresql.UUID(as_uuid=True))
 
+    sub_terms:   Mapped[list["TermORM"]] = relationship("TermORM")
+
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())
 

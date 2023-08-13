@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from datetime import datetime, timedelta
 from typing import Annotated
 from uuid import UUID
@@ -11,28 +12,29 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ConfigDict, Field
 
+from the_remember.src.api.terms.dto import CreateTermDTO, CreateTermAsTreeDTO, TermDTO
+
 
 # from pydantic.types import
 
-
-class ModuleDTO(BaseModel, extra='ignore', from_attributes=True):
-    # model_config = ConfigDict()
-
-    id: UUID
+class CreateModuleDTO(BaseModel, extra='ignore', from_attributes=True):
     name: str
+    root_folder_id: UUID | None = None
+
+
+class ModuleDTO(CreateModuleDTO):
+    id: UUID
     author_id: UUID
-    root_folder_id: UUID | None
 
     created_at: datetime
     updated_at: datetime
 
 
-class CreateModuleDTO(BaseModel):
-    name: str
-    root_folder_id: UUID | None
+class ModuleWithNestedEntitiesDTO(ModuleDTO):
+    sub_terms: list[TermDTO | None] | None = None
 
 
-class PersonalizeModuleDTO(ModuleDTO):
+class _AbstractPersonalizeModuleDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
     user_id: UUID
 
     is_reverse_definition_write: bool
@@ -40,6 +42,18 @@ class PersonalizeModuleDTO(ModuleDTO):
     is_reverse_definition_choice: bool
     standard_and_reverse_choice: bool
 
-
     personal_created_at: datetime
     personal_updated_at: datetime
+
+
+class PersonalizeModuleDTO(ModuleDTO, _AbstractPersonalizeModuleDTO):
+    pass
+
+
+class OnlyPersonalizePartModuleDTO(_AbstractPersonalizeModuleDTO):
+    module_id: UUID
+
+
+class CreateModuleAsTreeDTO(CreateModuleDTO):
+    id: UUID | None = None
+    sub_terms: list[CreateTermAsTreeDTO] = []

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from datetime import datetime, timedelta
 from typing import Annotated
 from uuid import UUID
@@ -15,28 +16,31 @@ from pydantic import BaseModel, ConfigDict, Field
 # from pydantic.types import
 
 
-class TermDTO(BaseModel, extra='ignore', from_attributes=True):
+class _AbstractTermDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
+    term: str
+    definition: str
+
+
+class CreateTermDTO(_AbstractTermDTO):
+    module_id: UUID
+
+
+class TermDTO(CreateTermDTO):
     # model_config = ConfigDict()
 
     id: UUID
-    term: str
-    definition: str
     module_id: UUID
-
 
     created_at: datetime
     updated_at: datetime
 
 
-class CreateTermDTO(BaseModel):
-    term: str
-    definition: str
-    module_id: UUID
+class CreateTermAsTreeDTO(_AbstractTermDTO):
+    module_id: UUID | None = None
 
 
-class PersonalizeTermDTO(TermDTO):
+class _AbstractPersonalizeTermDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
     user_id: UUID
-    term_id: UUID
 
     choose_error_counter: int
     write_error_counter: int
@@ -44,3 +48,12 @@ class PersonalizeTermDTO(TermDTO):
 
     personal_created_at: datetime
     personal_updated_at: datetime
+
+
+class PersonalizeTermDTO(TermDTO, _AbstractPersonalizeTermDTO):
+    pass
+
+
+class OnlyPersonalizePartTermDTO(_AbstractPersonalizeTermDTO):
+    term_id: UUID
+    module_id: UUID
