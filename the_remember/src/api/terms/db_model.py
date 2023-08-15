@@ -31,8 +31,11 @@ class TermORM(AbstractDbEntity):
     id: Mapped[UUID] = mapped_column(primary_key=True, type_=postgresql.UUID(as_uuid=True), server_default=sa.text("uuid_generate_v4()"))
     term: Mapped[str]
     definition: Mapped[str]
+    transcription: Mapped[str | None]
     module_id: Mapped[UUID] = mapped_column(ForeignKey("module.id"), type_=postgresql.UUID(as_uuid=True))
 
+    module_entity: Mapped[ModuleORM] = relationship(ModuleORM, back_populates='sub_terms')
+    sub_sentences: Mapped[list["SentenceORM"]] = relationship("SentenceORM", back_populates='term_entity')
 
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())

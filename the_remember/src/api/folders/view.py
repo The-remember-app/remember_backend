@@ -41,7 +41,7 @@ async def create_folder(
 
 
 @folder_app.post("/create/as_tree", response_model=list[str], status_code=201)
-async def create_folder(
+async def create_folder_as_tree(
         new_folders: list[CreateFolderAsTreeDTO],
         db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
@@ -77,7 +77,7 @@ async def get_all_folders(
 
 
 @folder_app.get("/all/as_tree", response_model=list[FolderWithNestedEntitiesDTO])
-async def get_all_folders(
+async def get_all_folders_as_tree(
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
@@ -89,7 +89,10 @@ async def get_all_folders(
     data = list(res)
     data1 = [i[0] for i in data if (
         await i[0].awaitable_attrs.sub_folders,
-        [await ii.awaitable_attrs.sub_terms for ii in await i[0].awaitable_attrs.sub_modules]
+        [
+            [await iii.awaitable_attrs.sub_terms
+             for iii in await ii.awaitable_attrs.sub_terms]
+            for ii in await i[0].awaitable_attrs.sub_modules]
     ) or True]
 
     return [FolderWithNestedEntitiesDTO.model_validate(i) for i in data1]
@@ -112,7 +115,7 @@ async def get_one_folder(
 
 
 @folder_app.get("/{folder_id}/with_parent", response_model=FolderWithRootEntityDTO)
-async def get_one_folder(
+async def get_one_folder_with_parents(
         folder_id: UUID,
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
@@ -132,7 +135,7 @@ async def get_one_folder(
 
 
 @folder_app.get("/{folder_id}/as_tree", response_model=FolderWithNestedEntitiesDTO)
-async def get_one_folder(
+async def get_one_folder_as_tree(
         folder_id: UUID,
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
@@ -150,6 +153,8 @@ async def get_one_folder(
         next_sub_folders = []
         for i in sub_folders:
             next_sub_folders += [ii for ii in await i.awaitable_attrs.sub_folders]
-            [await ii.awaitable_attrs.sub_terms for ii in await i.awaitable_attrs.sub_modules]
+            [[await iii.awaitable_attrs.sub_terms
+              for iii in await ii.awaitable_attrs.sub_terms]
+             for ii in await i.awaitable_attrs.sub_modules]
         sub_folders = next_sub_folders[:]
     return FolderWithNestedEntitiesDTO.model_validate(res2)

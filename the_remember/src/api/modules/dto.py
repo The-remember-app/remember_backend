@@ -19,6 +19,7 @@ from the_remember.src.api.terms.dto import CreateTermDTO, CreateTermAsTreeDTO, T
 
 class CreateModuleDTO(BaseModel, extra='ignore', from_attributes=True):
     name: str
+    description: str | None = ""
     root_folder_id: UUID | None = None
 
 
@@ -57,3 +58,17 @@ class OnlyPersonalizePartModuleDTO(_AbstractPersonalizeModuleDTO):
 class CreateModuleAsTreeDTO(CreateModuleDTO):
     id: UUID | None = None
     sub_terms: list[CreateTermAsTreeDTO] = []
+
+
+
+
+'''
+lie (lay, lain)
+wear   wear (wore, worn)
+de scribe      describe
+
+alter — изменять, модицифировать что-то
+The writers had to alter the script after the actress got sick – Сценаристам пришлось изменить сценарий после того, как актриса заболела
+
+The tailor altered my shirt by making it shorter – Портной подправил мою рубашку, сделав ее короче
+'''

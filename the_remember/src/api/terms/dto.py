@@ -12,6 +12,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ConfigDict, Field
 
+from the_remember.src.api.sentences.dto import CreateSentenceAsTreeDTO
+
 
 # from pydantic.types import
 
@@ -19,6 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class _AbstractTermDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
     term: str
     definition: str
+    transcription: str | None = None
 
 
 class CreateTermDTO(_AbstractTermDTO):
@@ -37,6 +40,7 @@ class TermDTO(CreateTermDTO):
 
 class CreateTermAsTreeDTO(_AbstractTermDTO):
     module_id: UUID | None = None
+    sub_sentences: list[CreateSentenceAsTreeDTO | None] | None = None
 
 
 class _AbstractPersonalizeTermDTO(BaseModel, ABC, extra='ignore', from_attributes=True):

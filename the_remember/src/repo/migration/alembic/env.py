@@ -9,6 +9,7 @@ from alembic import context
 
 from the_remember.env_load import load_from_env
 from the_remember.src.api.modules.db_model import PersonalizeModuleORM, ModuleORM
+from the_remember.src.api.sentences.db_model import SentenceORM
 from the_remember.src.api.terms.db_model import TermORM, PersonalizeTermORM
 
 load_from_env()
@@ -36,6 +37,7 @@ __db_models__ = [
     FolderORM, UserORM,
     ModuleORM, PersonalizeModuleORM,
     TermORM, PersonalizeTermORM,
+    SentenceORM
 ]
 
 target_metadata = AbstractDbEntity.metadata
