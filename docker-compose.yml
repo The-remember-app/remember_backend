@@ -30,18 +30,19 @@ services:
       db:
         condition: service_healthy
     image: daniinxorchenabo/the_remember_app_backend:latest
+    container_name: backend-${PROJECT_SUFFIX:-the_remember}
     build:
       context: ./the_remember
 
-    command:      >
+    command: >
       bash -c "
-      python -m alembic --config ./the_remember/src/repo/migration/_alembic.ini  upgrade head 
-       && uvicorn main:app --port ${TR_BACKEND_PORT} --host 0.0.0.0 --workers ${TR_BACKEND_APP_WORKERS_COUNT} --log-level debug      "
+      python -m alembic --config ./the_remember/src/repo/migration/_alembic.ini  upgrade head && uvicorn main:app --port ${TR_BACKEND_PORT} --host 0.0.0.0 --workers ${TR_BACKEND_APP_WORKERS_COUNT} --log-level debug      
+      "
 
     links:
       - "db:database"
     environment:
-      - POSTGRES_HOST=${POSTGRES_HOST:-db}
+      - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
     ports:
       - "${TR_BACKEND_PORT}:${TR_BACKEND_PORT}"
