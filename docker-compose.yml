@@ -35,7 +35,7 @@ services:
 
     command:      >
       bash -c "
-      python -m alembic --config the_remember/src/repo/migration/_alembic.ini  upgrade head 
+      python -m alembic --config ./the_remember/src/repo/migration/_alembic.ini  upgrade head 
        && uvicorn main:app --port ${TR_BACKEND_PORT} --host 0.0.0.0 --workers ${TR_BACKEND_APP_WORKERS_COUNT} --log-level debug      "
 
     links:
