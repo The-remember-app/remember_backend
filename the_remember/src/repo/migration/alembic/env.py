@@ -10,12 +10,12 @@ from alembic import context
 from the_remember.env_load import load_from_env
 from the_remember.src.api.modules.db_model import PersonalizeModuleORM, ModuleORM
 from the_remember.src.api.sentences.db_model import SentenceORM
-from the_remember.src.api.terms.db_model import TermORM, PersonalizeTermORM
+from the_remember.src.api.terms.db_model import TermORM, PersonalizeTermORM, AdditionalTermInfoORM
 
 load_from_env()
 
 from the_remember.src.config.config import CONFIG
-from the_remember.src.api.folders.db_model import FolderORM
+from the_remember.src.api.folders.db_model import FolderORM, PersonalizeFolderORM
 from the_remember.src.api.users.db_model import UserORM
 
 from the_remember.src.utils.db import AbstractDbEntity
@@ -34,10 +34,10 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 __db_models__ = [
-    FolderORM, UserORM,
+    FolderORM, UserORM, PersonalizeFolderORM,
     ModuleORM, PersonalizeModuleORM,
     TermORM, PersonalizeTermORM,
-    SentenceORM
+    SentenceORM, AdditionalTermInfoORM
 ]
 
 target_metadata = AbstractDbEntity.metadata

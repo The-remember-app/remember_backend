@@ -31,14 +31,30 @@ class FolderORM(AbstractDbEntity):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, type_=postgresql.UUID(as_uuid=True), server_default=sa.text("uuid_generate_v4()"))
     name: Mapped[str]
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), type_=postgresql.UUID(as_uuid=True))
+    author_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), type_=postgresql.UUID(as_uuid=True))
     root_folder_id: Mapped[UUID | None] = mapped_column(ForeignKey("folder.id"), type_=postgresql.UUID(as_uuid=True))
 
     # root_folder: Mapped[FolderORM | None] = relationship(back_populates="sub_folders", remote_side=[root_folder_id])
     sub_folders: Mapped[list[FolderORM]] = relationship("FolderORM", back_populates="root_folder_entity")
     sub_modules: Mapped[list["ModuleORM"]] = relationship("ModuleORM")
     root_folder_entity: Mapped[FolderORM] = relationship("FolderORM", back_populates='sub_folders',  remote_side=[id])
+    personalize_folders: Mapped[list[PersonalizeFolderORM]] = relationship("PersonalizeFolderORM", back_populates='folder_entity',)
 
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())
 
+
+
+class PersonalizeFolderORM(AbstractDbEntity):
+    __tablename__ = "personalize_folder"
+
+    folder_id: Mapped[UUID] = mapped_column(ForeignKey("folder.id"), type_=postgresql.UUID(as_uuid=True),
+                                            primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), type_=postgresql.UUID(as_uuid=True), primary_key=True)
+
+
+    personal_created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    personal_updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), server_onupdate=func.now())
+
+
+    folder_entity: Mapped[FolderORM] = relationship(FolderORM, back_populates='personalize_folders',  )
