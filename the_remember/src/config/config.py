@@ -26,6 +26,8 @@ class ConfigBuilder(object):
 
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
+    BACKEND_PORT = int(os.environ['TR_BACKEND_PORT'])
+
     POSTGRES_DB = os.environ['POSTGRES_DB']
     POSTGRES_USER = os.environ['POSTGRES_USER']
     POSTGRES_PASSWORD = os.environ['POSTGRES_PASSWORD']
