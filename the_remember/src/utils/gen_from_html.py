@@ -85,92 +85,92 @@ def get_words_from_words_page(url: str):
             )
             print(term, transcribe, definition)
     try:
-        sentences_html_piece = re.search(
-            r'((?:(?:<div[^>]*?class=\"su-list\"[^>]*[^<]*)(?:<ul[^@]*?(?=<\/ul>)<\/ul>))[^<]*<blockquote[^@]*?(?=<\/blockquote>)<\/blockquote>[^@]*?</div>)',
+        for sentences_html_piece in  re.findall(
+            r'((?:(?:<div[^>]*?class=\"su-list\"[^>]*[^<]*)(?:\s*<div>\s*)?(?:<ul[^@]*?(?=<\/ul>)<\/ul>))[^<]*<blockquote[^@]*?(?=<\/blockquote>)<\/blockquote>[^@]*?</div>)',
             mystr
-        ).groups()[0]
-        print("sentences_html_piece", sentences_html_piece)
+        ):
+            print("sentences_html_piece", sentences_html_piece)
 
-        print(sentences_html_piece)
-        for sent_html in re.findall(
-                r'(?:<ul[^@]*?(?=<\/ul>)<\/ul>)[^<]*<blockquote[^@]*?<\/blockquote>', sentences_html_piece):
-            print('-----')
-            print(sent_html)
-            try:
-                gr = re.search(
-                    r"(?:<\/i>[^<]*?(?:<a[^>]*>[^<]*)?<strong[^>]*>(?:(?:<a[^>]*>([^<]*)<\/a>([^<]*)(?=</strong>)</strong>(?:[^<]*</a>)?([^—<&#8212–-]*)(?:—|&#8212;|&#8212|–|-))|(?:([^<]*)</strong>(?:[^<]*</a>)?(?:[^<]*<strong>)?([^—<&#8212–-]*)(?:(?:</strong>\s*)?(?:—|&#8212;|&#8212|–|-))))([^<]*)<\/li>)[^@]*?(?=<p)(<p[^<]*<\/p>[^@]*?)(?=<\/blockquote>)",
-                    sent_html
-                ).groups()
-                main_term2, sub_terms2, _, main_term1, sub_terms1, definition, sentences_in_term = gr
-                main_term = main_term1 or main_term2
-                sub_terms = sub_terms1 or sub_terms2
+            print(sentences_html_piece)
+            for sent_html in re.findall(
+                    r'(?:<ul[^@]*?(?=<\/ul>)<\/ul>)[^<]*<blockquote[^@]*?<\/blockquote>', sentences_html_piece):
+                print('-----')
+                print(sent_html)
+                try:
+                    gr = re.search(
+                        r"(?:<\/i>[^<]*?(?:<a[^>]*>[^<]*)?<strong[^>]*>(?:(?:<a[^>]*>([^<]*)<\/a>([^<]*)(?=</strong>)</strong>(?:[^<]*</a>)?([^—<&#8212–-]*)(?:—|&#8212;|&#8212|–|-))|(?:([^<]*)</strong>(?:[^<]*</a>)?(?:[^<]*<strong>)?([^—<&#8212–-]*)(?:(?:</strong>\s*)?(?:—|&#8212;|&#8212|–|-))))([^<]*)<\/li>)[^@]*?(?=<p)(<p[^<]*<\/p>[^@]*?)(?=<\/blockquote>)",
+                        sent_html
+                    ).groups()
+                    main_term2, sub_terms2, _, main_term1, sub_terms1, definition, sentences_in_term = gr
+                    main_term = main_term1 or main_term2
+                    sub_terms = sub_terms1 or sub_terms2
 
-            except AttributeError as e:
-                print(e)
-                is_ok = False
-                is_continue = False
+                except AttributeError as e:
+                    print(e)
+                    is_ok = False
+                    is_continue = False
 
-                while is_ok is False:
-                    if sent_html in r_d:
-                        main_term, sub_terms, definition, sentences_in_term = r_d[sent_html]
-                        break
+                    while is_ok is False:
+                        if sent_html in r_d:
+                            main_term, sub_terms, definition, sentences_in_term = r_d[sent_html]
+                            break
+                        if is_continue:
+                            break
+
+                        print('Введите main_term')
+                        main_term = input()
+                        print('Введите sub_terms')
+                        sub_terms = input()
+                        print('Введите definition')
+                        definition = input()
+                        print('Введите sentences_in_term')
+                        sentences_in_term = input()
+
+                        is_ok = input("Введите 1 для подтверждения") == '1'
+
                     if is_continue:
-                        break
+                        continue
 
-                    print('Введите main_term')
-                    main_term = input()
-                    print('Введите sub_terms')
-                    sub_terms = input()
-                    print('Введите definition')
-                    definition = input()
-                    print('Введите sentences_in_term')
-                    sentences_in_term = input()
+                print(main_term, sub_terms, definition, sentences_in_term)
 
-                    is_ok = input("Введите 1 для подтверждения") == '1'
+                term = ((' '.join(
+                    (main_term.strip() + (
+                        " " + sub_terms.strip() if sub_terms and bool(sub_terms.strip()) else "")).split())
+                         .lower())
+                        .replace("( ", "(")
+                        .replace(" )", ")"))
+                if term in terms_entities:
+                    terms_entities[term].sub_sentences = []
+                elif term in bad_terms:
+                    new_term = bad_terms[term]
+                    terms_entities[new_term].sub_sentences = []
+                    terms_entities[term] = terms_entities[new_term]
+                else:
+                    add_words(term, terms_entities)
 
-                if is_continue:
-                    continue
-
-            print(main_term, sub_terms, definition, sentences_in_term)
-
-            term = ((' '.join(
-                (main_term.strip() + (
-                    " " + sub_terms.strip() if sub_terms and bool(sub_terms.strip()) else "")).split())
-                     .lower())
-                    .replace("( ", "(")
-                    .replace(" )", ")"))
-            if term in terms_entities:
-                terms_entities[term].sub_sentences = []
-            elif term in bad_terms:
-                new_term = bad_terms[term]
-                terms_entities[new_term].sub_sentences = []
-                terms_entities[term] = terms_entities[new_term]
-            else:
-                add_words(term, terms_entities)
-
-                print(terms_entities)
-                print(f'term {term} not in in terms_entities')
-                old_term = term
-
-                while term not in terms_entities:
+                    print(terms_entities)
                     print(f'term {term} not in in terms_entities')
-                    term = input()
+                    old_term = term
 
-                terms_entities[term].sub_sentences = []
-                terms_entities[old_term] = terms_entities[term]
-            for sentence_ent in re.findall(
-                    r'(?=<p)(?:<p[^>]*>([^&#8212\-\-\–]*).([^<]*))<\/p>',
-                    sentences_in_term
-            ):
-                print(sentence_ent)
-                sentence, translate = sentence_ent
-                print(sentence, translate)
-                terms_entities[term].sub_sentences += [
-                    CreateSentenceAsTreeDTO(
-                        sentence=' '.join(sentence.split()),
-                        translate=' '.join(translate.split())
-                    )
-                ]
+                    while term not in terms_entities:
+                        print(f'term {term} not in in terms_entities')
+                        term = input()
+
+                    terms_entities[term].sub_sentences = []
+                    terms_entities[old_term] = terms_entities[term]
+                for sentence_ent in re.findall(
+                        r'(?=<p)(?:<p[^>]*>([^&#8212\-\-\–]*).([^<]*))<\/p>',
+                        sentences_in_term
+                ):
+                    print(sentence_ent)
+                    sentence, translate = sentence_ent
+                    print(sentence, translate)
+                    terms_entities[term].sub_sentences += [
+                        CreateSentenceAsTreeDTO(
+                            sentence=' '.join(sentence.split()),
+                            translate=' '.join(translate.split())
+                        )
+                    ]
     except AttributeError as e:
         print(e)
         # sentences_html_piece = input("Введите sentences_html_piece")
@@ -182,7 +182,7 @@ async def main():
     async_session = async_sessionmaker(CONFIG.engine, expire_on_commit=False)
     async with async_session() as session:
         async with session.begin():
-            await create_folder_as_tree(res, session, UserDTO(
+            await create_folder_as_tree([res], session, UserDTO(
                 id=UUID("0a720d5e-af90-4ed3-b03b-e63d153f044d"),
                 username='string',
                 email='string',
@@ -221,8 +221,8 @@ become  (became, become)  ; становиться <p>I want to become a vet �
     # main_term = main_term1 or main_term2
     # sub_terms = sub_terms1 or sub_terms2
     # print(main_term, sub_terms, definition, sentences_in_term)
-
-    asyncio.run(main())
-    # print(get_3000_words())
+    # get_words_from_words_page('https://langformula.ru/voc3000/nouns-job/')
+    # asyncio.run(main())
+    print(get_3000_words())
 
     # get_words_from_words_page('https://langformula.ru/voc3000/verbs-stages/')

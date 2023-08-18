@@ -168,6 +168,8 @@ bad_terms = {
     "priso ner": "prisoner",
     "i nternet": "internet",
     "pc (personal computer)": 'personal computer (pc)',
+    "advanta ge": "advantage",
+    "load cargo": "load, cargo"
 
 }
 bad_terms |= {v: k for k, v in bad_terms.items()}
