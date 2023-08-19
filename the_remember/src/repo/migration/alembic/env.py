@@ -19,6 +19,7 @@ from the_remember.src.api.folders.db_model import FolderORM, PersonalizeFolderOR
 from the_remember.src.api.users.db_model import UserORM
 
 from the_remember.src.utils.db import AbstractDbEntity
+from the_remember.src.utils.post_db import __db_models__
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -33,15 +34,10 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-__db_models__ = [
-    FolderORM, UserORM, PersonalizeFolderORM,
-    ModuleORM, PersonalizeModuleORM,
-    TermORM, PersonalizeTermORM,
-    SentenceORM, AdditionalTermInfoORM
-]
+
 
 target_metadata = AbstractDbEntity.metadata
-
+print('target_models for migrating:', __db_models__)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
