@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from the_remember.src.api.auth.logics import get_db_session, get_current_user, get_db_write_session
 from the_remember.src.api.modules.db_model import ModuleORM
-from the_remember.src.api.terms.db_model import TermORM, PersonalizeTermORM
-from the_remember.src.api.terms.dto import TermDTO, CreateTermDTO, PersonalizeTermDTO
+from the_remember.src.api.terms.db_model import TermORM, PersonalizeTermORM, AdditionalTermInfoORM
+from the_remember.src.api.terms.dto import TermDTO, CreateTermDTO, PersonalizeTermDTO, PersonalizeTermWithAddInfoDTO
 from the_remember.src.api.users.dto import UserDTO
 from the_remember.src.config.config import CONFIG
 
@@ -66,6 +66,37 @@ async def get_all_term(
     return [PersonalizeTermDTO.model_validate(i[0].term_entity.__dict__ | i[0].__dict__) for i in data]
 
 
+@term_app.get("/module/{module_id}", response_model=list[PersonalizeTermWithAddInfoDTO])
+async def get_all_term(
+        module_id: UUID,
+        db_session: Annotated[AsyncSession, Depends(get_db_session)],
+        current_user: Annotated[UserDTO, Depends(get_current_user)]
+):
+    query = sa.text(  # language=PostgreSQL
+        """
+        SELECT *
+        from term
+        join module m on m.id = term.module_id
+        where m.id = :module_id
+    """).bindparams(module_id=module_id)
+    # query = query.columns(*[i for i in sa.inspect(TermORM).column_attrs]).cte('st')
+    # query = select()
+    res1 = (await db_session.execute(query))
+
+    res = await db_session.execute(
+        select(PersonalizeTermORM)
+        .join(PersonalizeTermORM.term_entity)
+        .join(TermORM.term_additional_info_entities)
+        .add_columns(TermORM)
+        .add_columns(AdditionalTermInfoORM)
+        .where((PersonalizeTermORM.user_id == current_user.id)
+               & (TermORM.module_id == module_id))
+    )
+
+    data = list(res)
+    return [PersonalizeTermWithAddInfoDTO.model_validate(i[0].__dict__ | i[1].__dict__ | {'term_additional_info_entities':  list(i[2])}) for i in data]
+
+
 @term_app.get("/{term_id}", response_model=PersonalizeTermDTO)
 async def get_one_term(
         term_id: UUID,
@@ -83,3 +114,6 @@ async def get_one_term(
 
     data = list(res)
     return PersonalizeTermDTO.model_validate(data[0][0].term_entity.__dict__ | data[0][0].__dict__)
+
+# from sqlalchemy.ext.asyncio.session import AsyncAttrs
+# _AsyncAttrGetitem

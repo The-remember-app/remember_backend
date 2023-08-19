@@ -7,9 +7,9 @@ from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from the_remember.src.api.auth.logics import get_db_session, get_current_user, get_db_write_session
-from the_remember.src.api.folders.db_model import FolderORM
+from the_remember.src.api.folders.db_model import FolderORM, PersonalizeFolderORM
 from the_remember.src.api.folders.dto import CreateFolderDTO, FolderDTO, CreateFolderAsTreeDTO, \
-    FolderWithNestedEntitiesDTO, FolderWithRootEntityDTO
+    FolderWithNestedEntitiesDTO, FolderWithRootEntityDTO, PersonalizeFolderDTO
 from the_remember.src.api.folders.logic import recourse_tree_to_db_models
 from the_remember.src.api.modules.db_model import ModuleORM
 from the_remember.src.api.modules.dto import CreateModuleAsTreeDTO
@@ -54,7 +54,7 @@ async def create_folder_as_tree(
     return ['ok']
 
 
-@folder_app.get("/all", response_model=list[FolderDTO])
+@folder_app.get("/all", response_model=list[PersonalizeFolderDTO])
 async def get_all_folders(
         db_session: Annotated[AsyncSession, Depends(get_db_session)],
         current_user: Annotated[UserDTO, Depends(get_current_user)]
@@ -64,16 +64,18 @@ async def get_all_folders(
     # print(res1)
 
     res = await db_session.execute(
-        select(FolderORM)
+        select(PersonalizeFolderORM)
+        .join(PersonalizeFolderORM.folder_entity)
+        .add_columns(FolderORM)
         # .join(FolderORM.root_folder_entity)
-        .where(FolderORM.user_id == current_user.id)
+        .where(PersonalizeFolderORM.user_id == current_user.id)
     )
 
     # var = FolderORM.root_folder_entity
 
     data = list(res)
     data1 = [i[0] for i in data]
-    return [FolderDTO.model_validate(i) for i in data1]
+    return [PersonalizeFolderDTO.model_validate(i.folder_entity.__dict__ | i.__dict__) for i in data1]
 
 
 @folder_app.get("/all/as_tree", response_model=list[FolderWithNestedEntitiesDTO])
@@ -83,7 +85,7 @@ async def get_all_folders_as_tree(
 ):
     res = await db_session.execute(
         select(FolderORM)
-        .where(FolderORM.user_id == current_user.id)
+        .where(FolderORM.author_id == current_user.id)
     )
 
     data = list(res)
@@ -105,7 +107,7 @@ async def get_one_folder(
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     res = await db_session.execute(
-        select(FolderORM).where((FolderORM.user_id == current_user.id)
+        select(FolderORM).where((FolderORM.author_id == current_user.id)
                                 & (FolderORM.id == folder_id))
     )
 
@@ -121,7 +123,7 @@ async def get_one_folder_with_parents(
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     res = await db_session.execute(
-        select(FolderORM).where((FolderORM.user_id == current_user.id)
+        select(FolderORM).where((FolderORM.author_id == current_user.id)
                                 & (FolderORM.id == folder_id))
     )
 
@@ -141,7 +143,7 @@ async def get_one_folder_as_tree(
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 ):
     res = await db_session.execute(
-        select(FolderORM).where((FolderORM.user_id == current_user.id)
+        select(FolderORM).where((FolderORM.author_id == current_user.id)
                                 & (FolderORM.id == folder_id))
     )
 
