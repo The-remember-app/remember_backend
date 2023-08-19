@@ -3,8 +3,11 @@ from __future__ import annotations
 import asyncio
 import datetime
 import enum
-from typing import List
+from abc import ABC
+from typing import List, Any
 
+from pydantic import BaseModel
+# from pydantic.main import Model
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
@@ -51,4 +54,5 @@ class AbstractPydanticEnum(str, enum.Enum):
             return var
         else:
             raise ValueError(f'Value must "str", not {var.__class__}')
+
 

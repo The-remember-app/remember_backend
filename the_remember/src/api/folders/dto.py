@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from datetime import datetime, timedelta
 from typing import Annotated
 from uuid import UUID
@@ -13,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from pydantic.functional_validators import AfterValidator, BeforeValidator, field_validator
 
 from the_remember.src.api.modules.dto import CreateModuleAsTreeDTO, ModuleDTO, ModuleWithNestedEntitiesDTO
+from the_remember.src.utils.post_db import OrmBaseModel
 from the_remember.src.utils.validators import relation_validator
 
 
@@ -21,7 +23,7 @@ from the_remember.src.utils.validators import relation_validator
 
 # RelFolderDTO = Annotated[FolderDTO | None, BeforeValidator(relation_validator)]
 
-class CreateFolderDTO(BaseModel, extra='ignore', from_attributes=True):
+class CreateFolderDTO(OrmBaseModel, extra='ignore', from_attributes=True):
     name: str
     root_folder_id: UUID | None = None
 
@@ -30,7 +32,7 @@ class FolderDTO(CreateFolderDTO):
     # model_config = ConfigDict()
 
     id: UUID
-    user_id: UUID
+    author_id: UUID
 
     created_at: datetime
     updated_at: datetime
@@ -53,10 +55,20 @@ class FolderWithRootEntityDTO(FolderDTO):
     root_folder_entity: FolderWithRootEntityDTO | None = None
 
 
-# RelFolderDTO = Annotated[FolderDTO | None, BeforeValidator(relation_validator)]
-# ListRelFolderDTO = Annotated[list[RelFolderDTO], BeforeValidator(relation_validator)]
-#
-# FolderDTO.model_rebuild()
+class _AbstractPersonalizeFolderDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
+    user_id: UUID
+
+    personal_created_at: datetime
+    personal_updated_at: datetime
+
+
+class PersonalizeFolderDTO(FolderDTO, _AbstractPersonalizeFolderDTO):
+    pass
+
+
+class OnlyPersonalizePartFolderDTO(_AbstractPersonalizeFolderDTO):
+    folder_id: UUID
+    root_folder_id: UUID
 
 
 class CreateFolderAsTreeDTO(CreateFolderDTO):

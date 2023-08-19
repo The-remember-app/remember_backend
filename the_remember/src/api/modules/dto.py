@@ -13,11 +13,12 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, ConfigDict, Field
 
 from the_remember.src.api.terms.dto import CreateTermDTO, CreateTermAsTreeDTO, TermDTO
+from the_remember.src.utils.post_db import OrmBaseModel
 
 
 # from pydantic.types import
 
-class CreateModuleDTO(BaseModel, extra='ignore', from_attributes=True):
+class CreateModuleDTO(OrmBaseModel, extra='ignore', from_attributes=True):
     name: str
     description: str | None = ""
     root_folder_id: UUID | None = None
@@ -35,7 +36,7 @@ class ModuleWithNestedEntitiesDTO(ModuleDTO):
     sub_terms: list[TermDTO | None] | None = None
 
 
-class _AbstractPersonalizeModuleDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
+class _AbstractPersonalizeModuleDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
     user_id: UUID
 
     is_reverse_definition_write: bool

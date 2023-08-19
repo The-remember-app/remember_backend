@@ -13,15 +13,16 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, ConfigDict, Field
 
 from the_remember.src.api.sentences.dto import CreateSentenceAsTreeDTO
+from the_remember.src.api.terms.enums import AddInfoTypeEnum
+from the_remember.src.utils.post_db import OrmBaseModel
 
 
 # from pydantic.types import
 
 
-class _AbstractTermDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
+class _AbstractTermDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
     term: str
     definition: str
-    transcription: str | None = None
 
 
 class CreateTermDTO(_AbstractTermDTO):
@@ -38,12 +39,7 @@ class TermDTO(CreateTermDTO):
     updated_at: datetime
 
 
-class CreateTermAsTreeDTO(_AbstractTermDTO):
-    module_id: UUID | None = None
-    sub_sentences: list[CreateSentenceAsTreeDTO | None] | None = None
-
-
-class _AbstractPersonalizeTermDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
+class _AbstractPersonalizeTermDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
     user_id: UUID
 
     choose_error_counter: int
@@ -61,3 +57,46 @@ class PersonalizeTermDTO(TermDTO, _AbstractPersonalizeTermDTO):
 class OnlyPersonalizePartTermDTO(_AbstractPersonalizeTermDTO):
     term_id: UUID
     module_id: UUID
+
+
+class _AbstractAdditionalTermInfoDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
+    text_data: str | None
+    adding_text_data: str | None = None
+    dialect_or_area: str | None = None
+    add_info_type: AddInfoTypeEnum = AddInfoTypeEnum.usual_term
+
+    parent_add_info_id: UUID | None = None
+
+
+class CreateAdditionalTermInfoDTO(_AbstractAdditionalTermInfoDTO):
+    term_id: UUID
+
+
+class AdditionalTermInfoDTO(CreateAdditionalTermInfoDTO):
+    id: UUID
+
+    created_at: datetime
+    updated_at: datetime
+
+
+class CreateAdditionalTermInfoAsTreeDTO(_AbstractAdditionalTermInfoDTO):
+    term_id: UUID | None = None
+    sub_add_info_entities: list[CreateAdditionalTermInfoAsTreeDTO] | None = None
+
+
+class CreateTermAsTreeDTO(_AbstractTermDTO):
+    module_id: UUID | None = None
+    sub_sentences: list[CreateSentenceAsTreeDTO | None] | None = None
+    term_additional_info_entities: list[CreateAdditionalTermInfoAsTreeDTO] | None = None
+
+
+class TermWithAddInfoDTO(TermDTO):
+    term_additional_info_entities: list[AdditionalTermInfoDTO] = []
+
+class PersonalizeTermWithAddInfoDTO(TermWithAddInfoDTO, _AbstractPersonalizeTermDTO):
+    pass
+
+
+class TermAsTreeDTO(TermDTO):
+    term_additional_info_entities: list[AdditionalTermInfoDTO] = []
+    personalize: OnlyPersonalizePartTermDTO | None = None

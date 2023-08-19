@@ -12,11 +12,13 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ConfigDict, Field
 
+from the_remember.src.utils.post_db import OrmBaseModel
+
 
 # from pydantic.types import
 
 
-class _AbstractSentenceDTO(BaseModel, ABC, extra='ignore', from_attributes=True):
+class _AbstractSentenceDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
     sentence: str
     translate: str
 
