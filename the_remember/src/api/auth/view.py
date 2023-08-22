@@ -1,6 +1,6 @@
 
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Literal
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -36,3 +36,8 @@ async def login_for_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@auth_app.post("/healthcheck", response_model=Literal['ok'])
+async def login_for_access_token():
+    return 'ok'
