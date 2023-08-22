@@ -93,6 +93,7 @@ class CreateTermAsTreeDTO(_AbstractTermDTO):
 class TermWithAddInfoDTO(TermDTO):
     term_additional_info_entities: list[AdditionalTermInfoDTO] = []
 
+
 class PersonalizeTermWithAddInfoDTO(TermWithAddInfoDTO, _AbstractPersonalizeTermDTO):
     pass
 
@@ -100,3 +101,18 @@ class PersonalizeTermWithAddInfoDTO(TermWithAddInfoDTO, _AbstractPersonalizeTerm
 class TermAsTreeDTO(TermDTO):
     term_additional_info_entities: list[AdditionalTermInfoDTO] = []
     personalize: OnlyPersonalizePartTermDTO | None = None
+
+
+class UpdateOnlyPersonalizePartTermDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
+    term_id: UUID
+
+    choose_error_counter: int
+    write_error_counter: int
+    choice_neg_error_counter: int
+
+    personal_updated_at: datetime
+
+
+class DeleteOnlyPersonalizePartTermDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
+    term_id: UUID
+    user_id: UUID

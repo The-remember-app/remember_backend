@@ -68,8 +68,18 @@ class PersonalizeFolderDTO(FolderDTO, _AbstractPersonalizeFolderDTO):
 
 class OnlyPersonalizePartFolderDTO(_AbstractPersonalizeFolderDTO):
     folder_id: UUID
-    root_folder_id: UUID
+    root_folder_id: UUID | None
 
+
+
+
+class UpdateOnlyPersonalizePartFolderDTO(OrmBaseModel, extra='ignore', from_attributes=True):
+    folder_id: UUID
+    personal_update_at: datetime
+
+class DeleteOnlyPersonalizePartFolderDTO(OrmBaseModel, extra='ignore', from_attributes=True):
+    user_id: UUID
+    folder_id: UUID
 
 class CreateFolderAsTreeDTO(CreateFolderDTO):
     id: UUID | None = None

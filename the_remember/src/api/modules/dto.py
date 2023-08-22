@@ -61,6 +61,20 @@ class CreateModuleAsTreeDTO(CreateModuleDTO):
     sub_terms: list[CreateTermAsTreeDTO] = []
 
 
+class UpdateOnlyPersonalizePartModuleDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
+    module_id: UUID
+
+    is_reverse_definition_write: bool
+    standard_and_reverse_write: bool
+    is_reverse_definition_choice: bool
+    standard_and_reverse_choice: bool
+
+    personal_updated_at: datetime
+
+
+class DeleteOnlyPersonalizePartModuleDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
+    module_id: UUID
+    user_id: UUID
 
 
 '''

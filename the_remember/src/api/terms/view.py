@@ -1,17 +1,21 @@
+import datetime
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.params import Depends
 import sqlalchemy as sa
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+
 
 from the_remember.src.api.auth.logics import get_db_session, get_current_user, get_db_write_session
 from the_remember.src.api.modules.db_model import ModuleORM
 from the_remember.src.api.terms.db_model import TermORM, PersonalizeTermORM, AdditionalTermInfoORM
 from the_remember.src.api.terms.dto import TermDTO, CreateTermDTO, PersonalizeTermDTO, PersonalizeTermWithAddInfoDTO, \
-    AdditionalTermInfoDTO
+    AdditionalTermInfoDTO, OnlyPersonalizePartTermDTO, DeleteOnlyPersonalizePartTermDTO, \
+    UpdateOnlyPersonalizePartTermDTO
 from the_remember.src.api.users.dto import UserDTO
 from the_remember.src.config.config import CONFIG
 
@@ -157,5 +161,48 @@ async def get_one_term(
     data = list(res)
     return PersonalizeTermDTO.model_validate(data[0][0].term_entity.__dict__ | data[0][0].__dict__)
 
-# from sqlalchemy.ext.asyncio.session import AsyncAttrs
-# _AsyncAttrGetitem
+
+
+@term_app.put("/personalize/create_or_update", response_model=list[OnlyPersonalizePartTermDTO], status_code=200)
+async def update_personalize_term(
+        update_terms: list[UpdateOnlyPersonalizePartTermDTO],
+        db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
+        current_user: Annotated[UserDTO, Depends(get_current_user)]
+
+):
+    index = [PersonalizeTermORM.term_id, PersonalizeTermORM.user_id]
+    vals = [
+        {'personal_update_at': datetime.datetime.utcnow()}
+        | update_term.model_dump()
+        | {'user_id': current_user.id}
+        for update_term in update_terms
+    ]
+    vals_key = frozenset(vals[0].keys())
+    query = ((_query := (pg_insert(PersonalizeTermORM)
+                         .values(vals)))
+             .on_conflict_do_update(
+        index_elements=index,
+        set_={i.key: i for i in _query.excluded._all_columns if i.key in vals_key}
+    )
+             .returning(PersonalizeTermORM)
+             )
+
+    data = list(await db_session.execute(query))
+    return [OnlyPersonalizePartTermDTO.model_validate(i[0]) for i in data]
+
+
+@term_app.delete("/personalize/delete", response_model=list[DeleteOnlyPersonalizePartTermDTO], status_code=200)
+async def delete_personalize_terme(
+        delete_term_ids: list[UUID],
+        db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
+        current_user: Annotated[UserDTO, Depends(get_current_user)]
+):
+    query = (delete(PersonalizeTermORM)
+             .where((PersonalizeTermORM.user_id == current_user.id)
+                    & (PersonalizeTermORM.term_id.in_(delete_term_ids)))
+             .returning(PersonalizeTermORM.term_id, PersonalizeTermORM.user_id)
+             )
+
+    data = list(await db_session.execute( query ))
+    return [DeleteOnlyPersonalizePartTermDTO.model_validate(i) for i in data]
+

@@ -88,7 +88,7 @@ class PersonalizeTermORM(AbstractDbEntity):
                                                                    server_onupdate=func.now())
 
 
-    module_entity: Mapped[ModuleORM] = relationship(ModuleORM)
+    # module_entity: Mapped[ModuleORM] = relationship(ModuleORM)
     term_entity: Mapped[TermORM] = relationship(TermORM, back_populates='personalized_term_entities')
-    personalize_module_entity: Mapped[PersonalizeModuleORM | None] = relationship('PersonalizeModuleORM', back_populates='personalize_terms',)
+    personalize_module_entity: Mapped[PersonalizeModuleORM] = relationship('PersonalizeModuleORM', back_populates='personalize_terms',)
 

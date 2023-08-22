@@ -1,15 +1,19 @@
+import datetime
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.params import Depends
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update, inspect, Column, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy.orm import ColumnProperty
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from the_remember.src.api.auth.logics import get_db_session, get_current_user, get_db_write_session
 from the_remember.src.api.folders.db_model import FolderORM, PersonalizeFolderORM
 from the_remember.src.api.folders.dto import CreateFolderDTO, FolderDTO, CreateFolderAsTreeDTO, \
-    FolderWithNestedEntitiesDTO, FolderWithRootEntityDTO, PersonalizeFolderDTO
+    FolderWithNestedEntitiesDTO, FolderWithRootEntityDTO, PersonalizeFolderDTO, OnlyPersonalizePartFolderDTO, \
+    UpdateOnlyPersonalizePartFolderDTO, DeleteOnlyPersonalizePartFolderDTO
 from the_remember.src.api.folders.logic import recourse_tree_to_db_models
 from the_remember.src.api.modules.db_model import ModuleORM
 from the_remember.src.api.modules.dto import CreateModuleAsTreeDTO
@@ -32,7 +36,7 @@ async def create_folder(
         res = await db_session.execute(
             insert(FolderORM)
             .returning(FolderORM),
-            [new_folder.model_dump() | {'user_id': current_user.id}]
+            [new_folder.model_dump() | {'author_id': current_user.id}]
         )
         data_ = list(res)
         data__ = data_[0]
@@ -92,7 +96,7 @@ async def get_all_folders_as_tree(
     data1 = [i[0] for i in data if (
         await i[0].awaitable_attrs.sub_folders,
         [
-            [await iii.awaitable_attrs.sub_terms
+            [(await iii.awaitable_attrs.term_additional_info_entities, await iii.awaitable_attrs.sub_sentences,)
              for iii in await ii.awaitable_attrs.sub_terms]
             for ii in await i[0].awaitable_attrs.sub_modules]
     ) or True]
@@ -160,3 +164,47 @@ async def get_one_folder_as_tree(
              for ii in await i.awaitable_attrs.sub_modules]
         sub_folders = next_sub_folders[:]
     return FolderWithNestedEntitiesDTO.model_validate(res2)
+
+
+@folder_app.put("/personalize/create_or_update", response_model=list[OnlyPersonalizePartFolderDTO], status_code=200)
+async def update_personalize_folder(
+        update_folders: list[UpdateOnlyPersonalizePartFolderDTO],
+        db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
+        current_user: Annotated[UserDTO, Depends(get_current_user)]
+
+):
+    index = [PersonalizeFolderORM.folder_id, PersonalizeFolderORM.user_id]
+    vals = [
+        {'personal_update_at': datetime.datetime.utcnow()}
+        | update_folder.model_dump()
+        | {'user_id': current_user.id}
+        for update_folder in update_folders
+    ]
+    vals_key = frozenset(vals[0].keys())
+    query = ((_query := (pg_insert(PersonalizeFolderORM)
+                         .values(vals)))
+             .on_conflict_do_update(
+        index_elements=index,
+        set_={i.key: i for i in _query.excluded._all_columns if i.key in vals_key}
+    )
+             .returning(PersonalizeFolderORM)
+             )
+
+    data = list(await db_session.execute(query))
+    return [OnlyPersonalizePartFolderDTO.model_validate(i[0]) for i in data]
+
+
+@folder_app.delete("/personalize/delete", response_model=list[DeleteOnlyPersonalizePartFolderDTO], status_code=200)
+async def delete_personalize_folder(
+        delete_folder_ids: list[UUID],
+        db_session: Annotated[AsyncSession, Depends(get_db_write_session)],
+        current_user: Annotated[UserDTO, Depends(get_current_user)]
+):
+    query = (delete(PersonalizeFolderORM)
+             .where((PersonalizeFolderORM.user_id == current_user.id)
+                    & (PersonalizeFolderORM.folder_id.in_(delete_folder_ids)))
+             .returning(PersonalizeFolderORM.folder_id, PersonalizeFolderORM.user_id)
+             )
+
+    data = list(await db_session.execute( query ))
+    return [DeleteOnlyPersonalizePartFolderDTO.model_validate(i) for i in data]
