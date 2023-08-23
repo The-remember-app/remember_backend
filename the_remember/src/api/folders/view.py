@@ -175,7 +175,7 @@ async def update_personalize_folder(
 ):
     index = [PersonalizeFolderORM.folder_id, PersonalizeFolderORM.user_id]
     vals = [
-        {'personal_update_at': datetime.datetime.utcnow()}
+        {'personal_updated_at': datetime.datetime.utcnow()}
         | update_folder.model_dump()
         | {'user_id': current_user.id}
         for update_folder in update_folders

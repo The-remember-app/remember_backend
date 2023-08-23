@@ -75,7 +75,7 @@ class OnlyPersonalizePartFolderDTO(_AbstractPersonalizeFolderDTO):
 
 class UpdateOnlyPersonalizePartFolderDTO(OrmBaseModel, extra='ignore', from_attributes=True):
     folder_id: UUID
-    personal_update_at: datetime
+    personal_updated_at: datetime
 
 class DeleteOnlyPersonalizePartFolderDTO(OrmBaseModel, extra='ignore', from_attributes=True):
     user_id: UUID

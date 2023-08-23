@@ -170,14 +170,16 @@ async def update_personalize_term(
         current_user: Annotated[UserDTO, Depends(get_current_user)]
 
 ):
-    index = [PersonalizeTermORM.term_id, PersonalizeTermORM.user_id]
+    index = [PersonalizeTermORM.user_id, PersonalizeTermORM.term_id, PersonalizeTermORM.module_id]
     vals = [
-        {'personal_update_at': datetime.datetime.utcnow()}
-        | update_term.model_dump()
+        {'personal_updated_at': datetime.datetime.utcnow()}
+        | update_term.model_dump(exclude_defaults=True)
         | {'user_id': current_user.id}
         for update_term in update_terms
     ]
-    vals_key = frozenset(vals[0].keys())
+    print(vals[0])
+    vals_key = set(vals[0].keys()) - {i.key for i in index}
+    print(vals_key)
     query = ((_query := (pg_insert(PersonalizeTermORM)
                          .values(vals)))
              .on_conflict_do_update(
@@ -186,7 +188,7 @@ async def update_personalize_term(
     )
              .returning(PersonalizeTermORM)
              )
-
+    print({i.key: i for i in _query.excluded._all_columns if i.key in vals_key})
     data = list(await db_session.execute(query))
     return [OnlyPersonalizePartTermDTO.model_validate(i[0]) for i in data]
 

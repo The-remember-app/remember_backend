@@ -105,6 +105,7 @@ class TermAsTreeDTO(TermDTO):
 
 class UpdateOnlyPersonalizePartTermDTO(OrmBaseModel, ABC, extra='ignore', from_attributes=True):
     term_id: UUID
+    module_id: UUID
 
     choose_error_counter: int
     write_error_counter: int

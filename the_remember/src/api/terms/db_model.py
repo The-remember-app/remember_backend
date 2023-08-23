@@ -6,7 +6,7 @@ from typing import List
 from uuid import UUID
 
 import sqlalchemy as sa
-from sqlalchemy import ForeignKey, PrimaryKeyConstraint, ForeignKeyConstraint, Column
+from sqlalchemy import ForeignKey, PrimaryKeyConstraint, ForeignKeyConstraint, Column, UniqueConstraint
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.dialects import postgresql
@@ -78,6 +78,8 @@ class PersonalizeTermORM(AbstractDbEntity):
     module_id: Mapped[UUID] = mapped_column(ForeignKey("module.id", ondelete='CASCADE', name='personalize_term__module_id__fk', ), type_=postgresql.UUID(as_uuid=True),)
 
     ForeignKeyConstraint([module_id, user_id], ['personalize_module.module_id', 'personalize_module.user_id'], name='personalize_term__to_personalize_module__fk', ondelete='CASCADE')
+    PrimaryKeyConstraint(term_id, user_id,  name='personalize_term__pk',)
+    UniqueConstraint(module_id,term_id, user_id, name='personalize_term__module_id_term_id_user_id__qc')
 
     choose_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
     write_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
