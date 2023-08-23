@@ -90,7 +90,7 @@ def upgrade():
                     sa.ForeignKeyConstraint(['module_id'], ['module.id'], ),
                     sa.ForeignKeyConstraint(['term_id'], ['term.id'], ),
                     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-                    sa.PrimaryKeyConstraint('module_id', 'user_id', 'term_id')
+                    sa.PrimaryKeyConstraint('module_id', 'user_id', 'term_id', name='personalize_term_pkey')
                     )
     # ### end Alembic commands ###
 
