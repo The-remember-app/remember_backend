@@ -177,6 +177,8 @@ async def update_personalize_term(
         | {'user_id': current_user.id}
         for update_term in update_terms
     ]
+    if bool(vals) is False:
+        return []
     print(vals[0])
     vals_key = set(vals[0].keys()) - {i.key for i in index}
     print(vals_key)

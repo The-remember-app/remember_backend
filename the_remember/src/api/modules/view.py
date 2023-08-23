@@ -86,6 +86,8 @@ async def update_personalize_module(
         | {'user_id': current_user.id}
         for update_module in update_modules
     ]
+    if bool(vals) is False:
+        return []
     vals_key = frozenset(vals[0].keys())
     query = ((_query := (pg_insert(PersonalizeModuleORM)
                          .values(vals)))

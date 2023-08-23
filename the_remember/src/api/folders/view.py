@@ -180,6 +180,8 @@ async def update_personalize_folder(
         | {'user_id': current_user.id}
         for update_folder in update_folders
     ]
+    if bool(vals) is False:
+        return []
     vals_key = frozenset(vals[0].keys())
     query = ((_query := (pg_insert(PersonalizeFolderORM)
                          .values(vals)))
