@@ -62,7 +62,7 @@ services:
     image: prodrigestivill/postgres-backup-local
     container_name: postgres-backup-${PROJECT_SUFFIX:-the_remember}
     volumes:
-      - db_backup_volume:/var/lib/postgresql/newwheel_prod_data_backup
+      - db_backup_volume:/var/lib/postgresql/the_remember_data_backup
 
     networks:
       - db_network
@@ -82,6 +82,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_EXTRA_OPTS=${POSTGRES_EXTRA_OPTS}
       - SCHEDULE=${POSTGRES_BACKUP_SCHEDULE}
+      - BACKUP_DIR=/var/lib/postgresql/the_remember_data_backup
       - BACKUP_KEEP_DAYS=${POSTGRES_BACKUP_KEEP_DAYS}
       - BACKUP_KEEP_WEEKS=${POSTGRES_BACKUP_KEEP_WEEKS}
       - BACKUP_KEEP_MONTHS=${POSTGRES_BACKUP_KEEP_MONTHS}
