@@ -43,6 +43,12 @@ class _AbstractPersonalizeModuleDTO(OrmBaseModel, ABC, extra='ignore', from_attr
     standard_and_reverse_write: bool
     is_reverse_definition_choice: bool
     standard_and_reverse_choice: bool
+    max_iteration_len: int
+    min_iteration_len: int
+    min_watch_count: int
+    known_term_part: int
+    choices_count: int
+
 
     personal_created_at: datetime
     personal_updated_at: datetime
@@ -68,6 +74,11 @@ class UpdateOnlyPersonalizePartModuleDTO(OrmBaseModel, ABC, extra='ignore', from
     standard_and_reverse_write: bool
     is_reverse_definition_choice: bool
     standard_and_reverse_choice: bool
+    max_iteration_len: int
+    min_iteration_len: int
+    min_watch_count: int
+    known_term_part: int
+    choices_count: int   
 
     personal_updated_at: datetime
 

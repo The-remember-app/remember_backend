@@ -57,6 +57,11 @@ class PersonalizeModuleORM(AbstractDbEntity):
     standard_and_reverse_write: Mapped[bool] = mapped_column(server_default=sa.text("false"))
     is_reverse_definition_choice: Mapped[bool] = mapped_column(server_default=sa.text("false"))
     standard_and_reverse_choice: Mapped[bool] = mapped_column(server_default=sa.text("false"))
+    max_iteration_len: Mapped[int] = mapped_column(server_default=sa.text("10"))
+    min_iteration_len: Mapped[int] = mapped_column(server_default=sa.text("4"))
+    min_watch_count: Mapped[int] = mapped_column(server_default=sa.text("5"))
+    known_term_part: Mapped[int] = mapped_column(server_default=sa.text("30"))
+    choices_count: Mapped[int] = mapped_column(server_default=sa.text("4"))
     # PrimaryKeyConstraint(module_id, user_id)
 
     personal_created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())

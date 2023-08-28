@@ -45,6 +45,7 @@ class _AbstractPersonalizeTermDTO(OrmBaseModel, ABC, extra='ignore', from_attrib
     choose_error_counter: int
     write_error_counter: int
     choice_neg_error_counter: int
+    watch_count: int
 
     personal_created_at: datetime
     personal_updated_at: datetime
@@ -110,6 +111,7 @@ class UpdateOnlyPersonalizePartTermDTO(OrmBaseModel, ABC, extra='ignore', from_a
     choose_error_counter: int
     write_error_counter: int
     choice_neg_error_counter: int
+    watch_count: int
 
     personal_updated_at: datetime
 

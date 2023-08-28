@@ -84,6 +84,7 @@ class PersonalizeTermORM(AbstractDbEntity):
     choose_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
     write_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
     choice_neg_error_counter: Mapped[int] = mapped_column(server_default=sa.text("0"))
+    watch_count: Mapped[int] = mapped_column(server_default=sa.text("0"))
 
     personal_created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     personal_updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(),
