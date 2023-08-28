@@ -1,7 +1,7 @@
 /**/.idea/**/*
 /**/.env
 !/**/.example.env
-/**/__pycashe__/**/*
+/**/__pycache__/**/*
 /**/venv/**/*
 /**/env/**/*
 /**/*.lnk

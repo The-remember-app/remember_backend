@@ -62,6 +62,8 @@ class PersonalizeModuleORM(AbstractDbEntity):
     min_watch_count: Mapped[int] = mapped_column(server_default=sa.text("5"))
     known_term_part: Mapped[int] = mapped_column(server_default=sa.text("30"))
     choices_count: Mapped[int] = mapped_column(server_default=sa.text("4"))
+    is_learnt: Mapped[bool] = mapped_column(server_default=sa.text("false"))
+
     # PrimaryKeyConstraint(module_id, user_id)
 
     personal_created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())

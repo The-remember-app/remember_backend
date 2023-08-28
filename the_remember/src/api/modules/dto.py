@@ -48,6 +48,7 @@ class _AbstractPersonalizeModuleDTO(OrmBaseModel, ABC, extra='ignore', from_attr
     min_watch_count: int
     known_term_part: int
     choices_count: int
+    is_learnt:bool
 
 
     personal_created_at: datetime
@@ -78,7 +79,8 @@ class UpdateOnlyPersonalizePartModuleDTO(OrmBaseModel, ABC, extra='ignore', from
     min_iteration_len: int
     min_watch_count: int
     known_term_part: int
-    choices_count: int   
+    choices_count: int
+    is_learnt:bool
 
     personal_updated_at: datetime
 
