@@ -65,6 +65,9 @@ services:
     container_name: postgres-backup-${PROJECT_SUFFIX:-the_remember}
     volumes:
       - db_backup_volume:/var/lib/postgresql/the_remember_data_backup
+      - type: bind
+        source: ./db_backups
+        target: /var/lib/postgresql/external
 
     networks:
       - db_network
