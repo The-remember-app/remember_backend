@@ -1,4 +1,5 @@
 import datetime
+from pprint import pprint
 from typing import Annotated
 from uuid import UUID
 
@@ -177,6 +178,7 @@ async def update_personalize_term(
         | {'user_id': current_user.id}
         for update_term in update_terms
     ]
+    pprint(update_terms)
     if bool(vals) is False:
         return []
     print(vals[0])
