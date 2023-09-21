@@ -15,3 +15,9 @@ class AddInfoTypeEnum(AbstractPydanticEnum):
     transcription = 'transcription'
 
 
+class WatchLearnTypeEnum(AbstractPydanticEnum):
+    choice = 'choice'
+    reverse_choice = 'reverse_choice'
+    write = 'write'
+    reverse_write = 'reverse_write'
+
