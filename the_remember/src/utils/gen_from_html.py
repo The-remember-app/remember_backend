@@ -1,4 +1,3 @@
-import asyncio
 import re
 import urllib.request
 from datetime import datetime
@@ -12,7 +11,7 @@ from the_remember.src.api.folders.dto import CreateFolderAsTreeDTO
 from the_remember.src.api.folders.view import create_folder_as_tree
 from the_remember.src.api.modules.dto import CreateModuleAsTreeDTO
 from the_remember.src.api.sentences.dto import CreateSentenceAsTreeDTO
-from the_remember.src.api.terms.dto import CreateTermAsTreeDTO
+from the_remember.src.api.terms.dtos.dto import CreateTermAsTreeDTO
 from the_remember.src.api.users.dto import UserDTO
 from the_remember.src.config.config import CONFIG
 from the_remember.src.utils._help_file import r_d, bad_terms, add_words

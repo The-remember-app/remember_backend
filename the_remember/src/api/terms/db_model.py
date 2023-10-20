@@ -97,7 +97,7 @@ class PersonalizeTermORM(AbstractDbEntity):
     # watch_time_marks_entities: Mapped[list['LearnTermDatetimeMark']] = relationship('LearnTermDatetimeMark', back_populates='personalize_term_entity',)
 
 
-class LearnTermDatetimeMark(AbstractDbEntity):
+class LearnTermDatetimeMarkORM(AbstractDbEntity):
     __tablename__ = "learn_term_datetime_mark"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, type_=postgresql.UUID(as_uuid=True),

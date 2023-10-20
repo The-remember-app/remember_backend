@@ -4,9 +4,8 @@ from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.params import Depends
-from sqlalchemy import insert, select, update, inspect, Column, delete
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-from sqlalchemy.orm import ColumnProperty
+from sqlalchemy import insert, select, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from the_remember.src.api.auth.logics import get_db_session, get_current_user, get_db_write_session
@@ -15,12 +14,7 @@ from the_remember.src.api.folders.dto import CreateFolderDTO, FolderDTO, CreateF
     FolderWithNestedEntitiesDTO, FolderWithRootEntityDTO, PersonalizeFolderDTO, OnlyPersonalizePartFolderDTO, \
     UpdateOnlyPersonalizePartFolderDTO, DeleteOnlyPersonalizePartFolderDTO
 from the_remember.src.api.folders.logic import recourse_tree_to_db_models
-from the_remember.src.api.modules.db_model import ModuleORM
-from the_remember.src.api.modules.dto import CreateModuleAsTreeDTO
-from the_remember.src.api.terms.db_model import TermORM
-from the_remember.src.api.terms.dto import CreateTermDTO, CreateTermAsTreeDTO
 from the_remember.src.api.users.dto import UserDTO
-from the_remember.src.config.config import CONFIG
 
 folder_app = APIRouter()
 

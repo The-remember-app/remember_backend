@@ -1,4 +1,4 @@
-from the_remember.src.api.terms.dto import CreateTermAsTreeDTO
+from the_remember.src.api.terms.dtos.dto import CreateTermAsTreeDTO
 
 r_d = dict()
 r_d |= {

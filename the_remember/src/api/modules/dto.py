@@ -1,18 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC
-from datetime import datetime, timedelta
-from typing import Annotated
+from datetime import datetime
 from uuid import UUID
 
-import uvicorn
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from pydantic import BaseModel, ConfigDict, Field
-
-from the_remember.src.api.terms.dto import CreateTermDTO, CreateTermAsTreeDTO, TermDTO
+from the_remember.src.api.terms.dtos.dto import CreateTermAsTreeDTO, TermDTO
 from the_remember.src.utils.post_db import OrmBaseModel
 
 
